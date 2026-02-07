@@ -9,7 +9,9 @@
     "residential_pct": 0.801,
     "size_eligible_count": 2807,
     "building_density": 121.12,
-    "priority_score": 0.5827
+    "priority_score": 0.5827,
+    "centroid_lat": 43.28452,
+    "centroid_lng": -80.449115
   },
   {
     "Settlement": "Baden",
@@ -21,7 +23,9 @@
     "residential_pct": 0.9358,
     "size_eligible_count": 1752,
     "building_density": 111.59,
-    "priority_score": 0.5985
+    "priority_score": 0.5985,
+    "centroid_lat": 43.404415,
+    "centroid_lng": -80.666634
   },
   {
     "Settlement": "Bamberg",
@@ -33,7 +37,9 @@
     "residential_pct": 0.6408,
     "size_eligible_count": 101,
     "building_density": 40.33,
-    "priority_score": 0.3251
+    "priority_score": 0.3251,
+    "centroid_lat": 43.488792,
+    "centroid_lng": -80.685734
   },
   {
     "Settlement": "Bloomingdale",
@@ -45,7 +51,9 @@
     "residential_pct": 0.6131,
     "size_eligible_count": 132,
     "building_density": 26.0,
-    "priority_score": 0.2775
+    "priority_score": 0.2775,
+    "centroid_lat": 43.507541,
+    "centroid_lng": -80.461628
   },
   {
     "Settlement": "Branchton",
@@ -57,7 +65,9 @@
     "residential_pct": 0.9621,
     "size_eligible_count": 128,
     "building_density": 36.25,
-    "priority_score": 0.4089
+    "priority_score": 0.4089,
+    "centroid_lat": 43.309106,
+    "centroid_lng": -80.261403
   },
   {
     "Settlement": 0,
@@ -69,7 +79,9 @@
     "residential_pct": 1.0,
     "size_eligible_count": 0,
     "building_density": 0.0,
-    "priority_score": 0.3
+    "priority_score": 0.3,
+    "centroid_lat": 0.0,
+    "centroid_lng": 0.0
   },
   {
     "Settlement": "Breslau",
@@ -81,7 +93,9 @@
     "residential_pct": 0.8812,
     "size_eligible_count": 1981,
     "building_density": 84.85,
-    "priority_score": 0.5232
+    "priority_score": 0.5232,
+    "centroid_lat": 43.479814,
+    "centroid_lng": -80.412571
   },
   {
     "Settlement": "Brown's",
@@ -93,7 +107,9 @@
     "residential_pct": 1.0,
     "size_eligible_count": 76,
     "building_density": 27.5,
-    "priority_score": 0.3995
+    "priority_score": 0.3995,
+    "centroid_lat": 43.359315,
+    "centroid_lng": -80.360394
   },
   {
     "Settlement": "Cambridge",
@@ -105,7 +121,9 @@
     "residential_pct": 0.9199,
     "size_eligible_count": 41016,
     "building_density": 126.22,
-    "priority_score": 0.7302
+    "priority_score": 0.7302,
+    "centroid_lat": 43.385733,
+    "centroid_lng": -80.315659
   },
   {
     "Settlement": "Clyde",
@@ -117,7 +135,9 @@
     "residential_pct": 0.9265,
     "size_eligible_count": 67,
     "building_density": 23.75,
-    "priority_score": 0.3643
+    "priority_score": 0.3643,
+    "centroid_lat": 43.384951,
+    "centroid_lng": -80.228595
   },
   {
     "Settlement": "Conestogo",
@@ -129,7 +149,9 @@
     "residential_pct": 0.8604,
     "size_eligible_count": 497,
     "building_density": 44.15,
-    "priority_score": 0.4158
+    "priority_score": 0.4158,
+    "centroid_lat": 43.543423,
+    "centroid_lng": -80.5009
   },
   {
     "Settlement": "Crosshill",
@@ -141,7 +163,9 @@
     "residential_pct": 0.4894,
     "size_eligible_count": 90,
     "building_density": 51.0,
-    "priority_score": 0.335
+    "priority_score": 0.335,
+    "centroid_lat": 43.529361,
+    "centroid_lng": -80.742808
   },
   {
     "Settlement": 0,
@@ -153,7 +177,9 @@
     "residential_pct": 0.875,
     "size_eligible_count": 0,
     "building_density": 0.0,
-    "priority_score": 0.2625
+    "priority_score": 0.2625,
+    "centroid_lat": 0.0,
+    "centroid_lng": 0.0
   },
   {
     "Settlement": "Elmira",
@@ -165,7 +191,9 @@
     "residential_pct": 0.8262,
     "size_eligible_count": 4394,
     "building_density": 155.9,
-    "priority_score": 0.7787
+    "priority_score": 0.7787,
+    "centroid_lat": 43.594262,
+    "centroid_lng": -80.567357
   },
   {
     "Settlement": "Floradale",
@@ -177,7 +205,9 @@
     "residential_pct": 0.4868,
     "size_eligible_count": 146,
     "building_density": 58.33,
-    "priority_score": 0.3344
+    "priority_score": 0.3344,
+    "centroid_lat": 43.634478,
+    "centroid_lng": -80.580248
   },
   {
     "Settlement": "Greenfield",
@@ -189,7 +219,9 @@
     "residential_pct": 0.6786,
     "size_eligible_count": 54,
     "building_density": 18.75,
-    "priority_score": 0.2662
+    "priority_score": 0.2662,
+    "centroid_lat": 43.299602,
+    "centroid_lng": -80.476365
   },
   {
     "Settlement": "Hawkesville",
@@ -201,7 +233,9 @@
     "residential_pct": 0.586,
     "size_eligible_count": 146,
     "building_density": 63.33,
-    "priority_score": 0.397
+    "priority_score": 0.397,
+    "centroid_lat": 43.563915,
+    "centroid_lng": -80.638493
   },
   {
     "Settlement": "Haysville",
@@ -213,7 +247,9 @@
     "residential_pct": 0.7679,
     "size_eligible_count": 55,
     "building_density": 15.75,
-    "priority_score": 0.2794
+    "priority_score": 0.2794,
+    "centroid_lat": 43.354849,
+    "centroid_lng": -80.663686
   },
   {
     "Settlement": "Heidelberg",
@@ -225,7 +261,9 @@
     "residential_pct": 0.8599,
     "size_eligible_count": 412,
     "building_density": 55.33,
-    "priority_score": 0.4498
+    "priority_score": 0.4498,
+    "centroid_lat": 43.523858,
+    "centroid_lng": -80.618463
   },
   {
     "Settlement": "Kingwood",
@@ -237,7 +275,9 @@
     "residential_pct": 0.5385,
     "size_eligible_count": 25,
     "building_density": 25.0,
-    "priority_score": 0.2262
+    "priority_score": 0.2262,
+    "centroid_lat": 43.511446,
+    "centroid_lng": -80.833182
   },
   {
     "Settlement": "Kitchener",
@@ -249,7 +289,9 @@
     "residential_pct": 0.7341,
     "size_eligible_count": 86034,
     "building_density": 229.82,
-    "priority_score": 0.8921
+    "priority_score": 0.8921,
+    "centroid_lat": 43.429153,
+    "centroid_lng": -80.477807
   },
   {
     "Settlement": "Linwood",
@@ -261,7 +303,9 @@
     "residential_pct": 0.6984,
     "size_eligible_count": 371,
     "building_density": 79.4,
-    "priority_score": 0.4664
+    "priority_score": 0.4664,
+    "centroid_lat": 43.580713,
+    "centroid_lng": -80.727516
   },
   {
     "Settlement": "Mannheim",
@@ -273,7 +317,9 @@
     "residential_pct": 0.942,
     "size_eligible_count": 326,
     "building_density": 60.83,
-    "priority_score": 0.505
+    "priority_score": 0.505,
+    "centroid_lat": 43.397844,
+    "centroid_lng": -80.543495
   },
   {
     "Settlement": "Maryhill",
@@ -285,7 +331,9 @@
     "residential_pct": 0.7829,
     "size_eligible_count": 274,
     "building_density": 63.2,
-    "priority_score": 0.4476
+    "priority_score": 0.4476,
+    "centroid_lat": 43.535591,
+    "centroid_lng": -80.391342
   },
   {
     "Settlement": "New Dundee",
@@ -297,7 +345,9 @@
     "residential_pct": 0.8764,
     "size_eligible_count": 436,
     "building_density": 59.0,
-    "priority_score": 0.4599
+    "priority_score": 0.4599,
+    "centroid_lat": 43.350459,
+    "centroid_lng": -80.533803
   },
   {
     "Settlement": "New Hamburg",
@@ -309,7 +359,9 @@
     "residential_pct": 0.9101,
     "size_eligible_count": 3233,
     "building_density": 106.26,
-    "priority_score": 0.6209
+    "priority_score": 0.6209,
+    "centroid_lat": 43.379262,
+    "centroid_lng": -80.70751
   },
   {
     "Settlement": "North Dumfries",
@@ -321,7 +373,9 @@
     "residential_pct": 0.4191,
     "size_eligible_count": 2655,
     "building_density": 7.7,
-    "priority_score": 0.1628
+    "priority_score": 0.1628,
+    "centroid_lat": 43.325417,
+    "centroid_lng": -80.34978
   },
   {
     "Settlement": "Petersburg",
@@ -333,7 +387,9 @@
     "residential_pct": 0.759,
     "size_eligible_count": 152,
     "building_density": 39.8,
-    "priority_score": 0.3833
+    "priority_score": 0.3833,
+    "centroid_lat": 43.414159,
+    "centroid_lng": -80.604518
   },
   {
     "Settlement": "Philipsburg",
@@ -345,7 +401,9 @@
     "residential_pct": 0.6304,
     "size_eligible_count": 46,
     "building_density": 19.5,
-    "priority_score": 0.2514
+    "priority_score": 0.2514,
+    "centroid_lat": 43.420365,
+    "centroid_lng": -80.723882
   },
   {
     "Settlement": "Reidsville",
@@ -357,7 +415,9 @@
     "residential_pct": 0.75,
     "size_eligible_count": 24,
     "building_density": 10.33,
-    "priority_score": 0.2605
+    "priority_score": 0.2605,
+    "centroid_lat": 43.318479,
+    "centroid_lng": -80.437921
   },
   {
     "Settlement": "Roseville",
@@ -369,7 +429,9 @@
     "residential_pct": 0.8433,
     "size_eligible_count": 132,
     "building_density": 36.5,
-    "priority_score": 0.377
+    "priority_score": 0.377,
+    "centroid_lat": 43.342473,
+    "centroid_lng": -80.474527
   },
   {
     "Settlement": "St Agatha",
@@ -381,7 +443,9 @@
     "residential_pct": 0.7845,
     "size_eligible_count": 225,
     "building_density": 45.67,
-    "priority_score": 0.3866
+    "priority_score": 0.3866,
+    "centroid_lat": 43.435656,
+    "centroid_lng": -80.63016
   },
   {
     "Settlement": "St Clements",
@@ -393,7 +457,9 @@
     "residential_pct": 0.7028,
     "size_eligible_count": 589,
     "building_density": 67.5,
-    "priority_score": 0.4372
+    "priority_score": 0.4372,
+    "centroid_lat": 43.524391,
+    "centroid_lng": -80.651624
   },
   {
     "Settlement": "St Jacobs",
@@ -405,7 +471,9 @@
     "residential_pct": 0.7582,
     "size_eligible_count": 783,
     "building_density": 65.86,
-    "priority_score": 0.5314
+    "priority_score": 0.5314,
+    "centroid_lat": 43.535098,
+    "centroid_lng": -80.552682
   },
   {
     "Settlement": "Unknown",
@@ -417,7 +485,9 @@
     "residential_pct": 0.0,
     "size_eligible_count": 0,
     "building_density": 0.0,
-    "priority_score": 0.0
+    "priority_score": 0.0,
+    "centroid_lat": 0.0,
+    "centroid_lng": 0.0
   },
   {
     "Settlement": "Wallenstein",
@@ -429,7 +499,9 @@
     "residential_pct": 0.3676,
     "size_eligible_count": 63,
     "building_density": 24.67,
-    "priority_score": 0.1916
+    "priority_score": 0.1916,
+    "centroid_lat": 43.597198,
+    "centroid_lng": -80.631047
   },
   {
     "Settlement": "Waterloo",
@@ -441,7 +513,9 @@
     "residential_pct": 0.9435,
     "size_eligible_count": 29717,
     "building_density": 166.6,
-    "priority_score": 0.9005
+    "priority_score": 0.9005,
+    "centroid_lat": 43.476738,
+    "centroid_lng": -80.542159
   },
   {
     "Settlement": "Wellesley",
@@ -453,7 +527,9 @@
     "residential_pct": 0.3841,
     "size_eligible_count": 4855,
     "building_density": 9.05,
-    "priority_score": 0.1566
+    "priority_score": 0.1566,
+    "centroid_lat": 43.531616,
+    "centroid_lng": -80.726814
   },
   {
     "Settlement": "West Montrose",
@@ -465,7 +541,9 @@
     "residential_pct": 0.9451,
     "size_eligible_count": 89,
     "building_density": 28.0,
-    "priority_score": 0.3691
+    "priority_score": 0.3691,
+    "centroid_lat": 43.58867,
+    "centroid_lng": -80.480234
   },
   {
     "Settlement": "Wilmot",
@@ -477,7 +555,9 @@
     "residential_pct": 0.3543,
     "size_eligible_count": 3825,
     "building_density": 7.56,
-    "priority_score": 0.137
+    "priority_score": 0.137,
+    "centroid_lat": 43.39805,
+    "centroid_lng": -80.646902
   },
   {
     "Settlement": "Winterbourne",
@@ -489,7 +569,9 @@
     "residential_pct": 0.7044,
     "size_eligible_count": 157,
     "building_density": 47.0,
-    "priority_score": 0.3578
+    "priority_score": 0.3578,
+    "centroid_lat": 43.558916,
+    "centroid_lng": -80.469986
   },
   {
     "Settlement": "Woolwich",
@@ -501,6 +583,8 @@
     "residential_pct": 0.3073,
     "size_eligible_count": 4513,
     "building_density": 7.55,
-    "priority_score": 0.1283
+    "priority_score": 0.1283,
+    "centroid_lat": 43.561618,
+    "centroid_lng": -80.500511
   }
 ]

@@ -71,6 +71,154 @@
     .detail-panel .close { float: right; cursor: pointer; font-size: 18px; color: #999; }
     .detail-panel .close:hover { color: #333; }
     .detail-panel .area-stats { margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; font-size: 12px; }
+
+    /* ── Chat Panel ─────────────────────────────────────── */
+    .chat-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #2166ac;
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .chat-toggle:hover { background: #1a5490; }
+    .chat-toggle.open { background: #d6604d; }
+
+    .chat-panel {
+      position: fixed;
+      bottom: 88px;
+      right: 24px;
+      width: 380px;
+      max-height: 520px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      z-index: 1100;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .chat-panel.visible { display: flex; }
+
+    .chat-header {
+      padding: 12px 16px;
+      background: #2166ac;
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chat-header .chat-new {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .chat-header .chat-new:hover { background: rgba(255,255,255,0.35); }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 280px;
+      max-height: 380px;
+    }
+
+    .chat-msg {
+      max-width: 85%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      word-wrap: break-word;
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      background: #2166ac;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-msg.assistant {
+      align-self: flex-start;
+      background: #f0f0f0;
+      color: #222;
+      border-bottom-left-radius: 4px;
+    }
+    .chat-msg.assistant strong { color: #2166ac; }
+    .chat-msg.system {
+      align-self: center;
+      background: transparent;
+      color: #999;
+      font-size: 11px;
+      font-style: italic;
+    }
+    .chat-msg.assistant .action-tag {
+      display: inline-block;
+      background: #e3eef7;
+      color: #2166ac;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-top: 4px;
+      margin-right: 4px;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px;
+      border-top: 1px solid #eee;
+      background: #fafafa;
+    }
+    .chat-input-row input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      font-size: 13px;
+      outline: none;
+    }
+    .chat-input-row input:focus { border-color: #2166ac; }
+    .chat-input-row button {
+      padding: 8px 16px;
+      background: #2166ac;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .chat-input-row button:hover { background: #1a5490; }
+    .chat-input-row button:disabled { background: #aaa; cursor: not-allowed; }
+
+    .chat-typing {
+      padding: 4px 16px 8px;
+      font-size: 11px;
+      color: #999;
+      font-style: italic;
+      display: none;
+    }
+    .chat-typing.visible { display: block; }
   </style>
 </head>
 <body>
@@ -140,6 +288,23 @@
     <span class="close" id="closeDetail">&times;</span>
     <h4>Cell / Area Stats</h4>
     <div id="detailContent"></div>
+  </div>
+
+  <!-- Chat UI -->
+  <button class="chat-toggle" id="chatToggle" title="Grant Advisor Chat">&#128172;</button>
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+      <span>Grant Targeting Advisor</span>
+      <button class="chat-new" id="chatNewBtn" title="New conversation">New chat</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg system">Ask me about grant eligibility, priority areas, or building analysis.</div>
+    </div>
+    <div class="chat-typing" id="chatTyping">Thinking...</div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Ask about grants, areas, eligibility...">
+      <button id="chatSendBtn">Send</button>
+    </div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -440,6 +605,163 @@
     }).catch(err => {
       document.body.insertAdjacentHTML('beforeend', '<p style="position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#c00;color:#fff;padding:8px 16px;border-radius:8px;z-index:9999;">Run compute_uhi.py, build_building_scores.py, build_neighborhood_stats.py, enrich_uhi_grid.py, then serve (python -m http.server 8000)</p>');
       console.error(err);
+    });
+
+    // ── Chat + Map Action Bridge ──────────────────────────
+    const CHAT_API = 'http://localhost:8001';
+    let chatThreadId = null;
+
+    const chatToggle = document.getElementById('chatToggle');
+    const chatPanel = document.getElementById('chatPanel');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    const chatNewBtn = document.getElementById('chatNewBtn');
+    const chatTyping = document.getElementById('chatTyping');
+
+    chatToggle.onclick = () => {
+      chatPanel.classList.toggle('visible');
+      chatToggle.classList.toggle('open');
+      if (chatPanel.classList.contains('visible')) chatInput.focus();
+    };
+
+    chatNewBtn.onclick = () => {
+      chatThreadId = null;
+      chatMessages.innerHTML = '<div class="chat-msg system">New conversation started. Ask me anything!</div>';
+    };
+
+    function addChatMsg(role, text, actions) {
+      const div = document.createElement('div');
+      div.className = `chat-msg ${role}`;
+
+      // Simple markdown-ish rendering for assistant
+      if (role === 'assistant') {
+        let html = text
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\n- /g, '<br>• ')
+          .replace(/\n\d+\.\s/g, (m) => '<br>' + m.trim() + ' ')
+          .replace(/\n/g, '<br>');
+        if (actions && actions.length) {
+          html += '<br>';
+          actions.forEach(a => {
+            const label = a.type.replace(/_/g, ' ');
+            const detail = a.settlement || a.building_type || '';
+            html += `<span class="action-tag">${label}${detail ? ': ' + detail : ''}</span>`;
+          });
+        }
+        div.innerHTML = html;
+      } else {
+        div.textContent = text;
+      }
+
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function getMapState() {
+      return {
+        settlement: document.getElementById('neighborhood').value,
+        size_eligible_only: document.getElementById('sizeEligibleOnly').checked,
+        building_type: document.getElementById('buildingType').value,
+        storey_tier: document.getElementById('storeyTier').value,
+        min_coverage: parseFloat(document.getElementById('covMin').value),
+        show_buildings: document.getElementById('showBuildings').checked,
+      };
+    }
+
+    // ── Map action executor ──
+    function executeActions(actions) {
+      if (!actions || !actions.length) return;
+      actions.forEach(action => {
+        switch (action.type) {
+          case 'highlight_settlement': {
+            const sel = document.getElementById('neighborhood');
+            const opt = Array.from(sel.options).find(o => o.value === action.settlement);
+            if (opt) {
+              sel.value = action.settlement;
+              sel.dispatchEvent(new Event('change'));
+            }
+            break;
+          }
+          case 'zoom_to_settlement': {
+            const ns = neighborhoodStats.find(n => n.Settlement === action.settlement);
+            if (ns && ns.centroid_lat && ns.centroid_lng) {
+              map.flyTo([ns.centroid_lat, ns.centroid_lng], 13);
+            } else {
+              // Fallback: highlight it which triggers the filter
+              const sel = document.getElementById('neighborhood');
+              sel.value = action.settlement;
+              sel.dispatchEvent(new Event('change'));
+            }
+            break;
+          }
+          case 'apply_filters': {
+            if (action.size_eligible_only !== undefined && action.size_eligible_only !== null) {
+              document.getElementById('sizeEligibleOnly').checked = action.size_eligible_only;
+            }
+            if (action.building_type !== undefined && action.building_type !== null) {
+              document.getElementById('buildingType').value = action.building_type;
+            }
+            if (action.storey_tier !== undefined && action.storey_tier !== null) {
+              document.getElementById('storeyTier').value = action.storey_tier;
+            }
+            if (action.min_coverage !== undefined && action.min_coverage !== null) {
+              document.getElementById('covMin').value = action.min_coverage;
+              document.getElementById('covMinVal').textContent = action.min_coverage;
+            }
+            applyFilters();
+            break;
+          }
+          case 'show_building_points': {
+            document.getElementById('showBuildings').checked = !!action.visible;
+            applyFilters();
+            break;
+          }
+        }
+      });
+    }
+
+    async function sendChatMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      addChatMsg('user', text);
+      chatInput.value = '';
+      chatSendBtn.disabled = true;
+      chatTyping.classList.add('visible');
+
+      try {
+        const resp = await fetch(`${CHAT_API}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            thread_id: chatThreadId,
+            map_state: getMapState(),
+          }),
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ detail: 'Unknown error' }));
+          throw new Error(err.detail || `HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        chatThreadId = data.thread_id;
+        addChatMsg('assistant', data.message, data.actions);
+        executeActions(data.actions);
+      } catch (err) {
+        addChatMsg('system', `Error: ${err.message}. Is the backend running? (uvicorn chat_backend:app --port 8001)`);
+        console.error('Chat error:', err);
+      } finally {
+        chatSendBtn.disabled = false;
+        chatTyping.classList.remove('visible');
+      }
+    }
+
+    chatSendBtn.onclick = sendChatMessage;
+    chatInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
     });
   </script>
 </body>

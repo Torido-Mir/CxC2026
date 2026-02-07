@@ -22,6 +22,12 @@ def main():
     grid = grid.to_crs("EPSG:4326")
 
     # Assign dominant Settlement to each grid cell: which buildings intersect each cell?
+    # Drop pre-existing settlement column (added by enrich_uhi_grid.py) to avoid merge conflicts
+    if "settlement" in grid.columns:
+        grid = grid.drop(columns=["settlement"])
+    if "Settlement" in grid.columns:
+        grid = grid.drop(columns=["Settlement"])
+
     joined = gpd.sjoin(
         grid[["grid_id", "geometry", "coverage_pct", "building_count"]],
         buildings[["geometry", "Settlement"]],
@@ -109,6 +115,22 @@ def main():
         + 0.3 * stats["residential_pct"]
     ).round(4)
 
+    # Compute settlement centroids from building locations
+    centroids = buildings.groupby("Settlement").agg(
+        centroid_lat=("geometry", lambda g: g.centroid.y.mean()),
+        centroid_lng=("geometry", lambda g: g.centroid.x.mean()),
+    ).reset_index()
+    stats = stats.merge(
+        centroids,
+        left_on="settlement",
+        right_on="Settlement",
+        how="left",
+        suffixes=("", "_centroid"),
+    )
+    stats = stats[[c for c in stats.columns if c != "Settlement_centroid" and c != "Settlement"]].copy()
+    stats["centroid_lat"] = stats["centroid_lat"].round(6)
+    stats["centroid_lng"] = stats["centroid_lng"].round(6)
+
     # Clean columns for output
     out = stats[
         [
@@ -122,6 +144,8 @@ def main():
             "size_eligible_count",
             "building_density",
             "priority_score",
+            "centroid_lat",
+            "centroid_lng",
         ]
     ].copy()
     out = out.rename(columns={"settlement": "Settlement"})

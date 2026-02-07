@@ -1,2 +1,6 @@
 geopandas>=0.14.0
 shapely>=2.0.0
+backboard-sdk
+fastapi
+uvicorn[standard]
+python-dotenv
