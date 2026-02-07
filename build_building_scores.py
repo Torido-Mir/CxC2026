@@ -39,12 +39,25 @@ def main():
 
     buildings["storey_category"] = buildings["Storeys"].apply(storey_cat)
 
-    # SVR proxy (box model): SA/Volume, height_ft = Storeys * 10
+    # ── SVR proxy using real polygon geometry ──────────────
+    # Project to a metre-based CRS for accurate area/perimeter,
+    # then convert back to WGS 84 for the final output.
+    buildings_m = buildings.to_crs("EPSG:32617")  # UTM 17N (Waterloo Region)
+
+    # Real perimeter (ft) and footprint area (sq ft) from the polygon
+    M_TO_FT = 3.28084
+    SQM_TO_SQFT = 10.7639
+    buildings["perimeter_ft"] = buildings_m.geometry.length * M_TO_FT
+    buildings["footprint_sqft_geo"] = buildings_m.geometry.area * SQM_TO_SQFT
+
     def svr_proxy(row):
-        floor = max(1, row["FootprintSqft"])
+        floor = max(1, row["footprint_sqft_geo"])   # real footprint area
+        perimeter = max(4, row["perimeter_ft"])      # real perimeter
         storeys = max(0.5, row["Storeys"])
-        height_ft = storeys * 10
-        sa = 2 * floor + 4 * (floor ** 0.5) * height_ft
+        height_ft = storeys * 10  # assume 10 ft per storey
+
+        # Surface area = roof + ground + walls (perimeter × height)
+        sa = 2 * floor + perimeter * height_ft
         vol = floor * height_ft
         if vol <= 0:
             return 0
@@ -52,8 +65,19 @@ def main():
 
     buildings["svr_proxy"] = buildings.apply(svr_proxy, axis=1)
 
-    # Centroids for point layer
-    buildings["geometry"] = buildings.geometry.centroid
+    # Also add compactness ratio: 4π × area / perimeter²
+    # Perfect circle = 1.0; more irregular / elongated shapes → lower values
+    buildings["compactness"] = buildings.apply(
+        lambda r: round(
+            4 * np.pi * max(1, r["footprint_sqft_geo"]) / max(1, r["perimeter_ft"]) ** 2, 4
+        ),
+        axis=1,
+    )
+
+    # Centroids for point layer (use projected CRS for accuracy, then back to WGS 84)
+    buildings_m = buildings.to_crs("EPSG:32617")
+    buildings["geometry"] = buildings_m.geometry.centroid
+    buildings = buildings.set_crs("EPSG:32617", allow_override=True).to_crs("EPSG:4326")
 
     # Keep only needed columns for web
     out = buildings[
@@ -68,6 +92,7 @@ def main():
             "size_eligible",
             "storey_category",
             "svr_proxy",
+            "compactness",
             "geometry",
         ]
     ].copy()

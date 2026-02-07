@@ -70,20 +70,6 @@
     "centroid_lng": -80.261403
   },
   {
-    "Settlement": 0,
-    "avg_coverage": 0.0,
-    "max_coverage": 0.0,
-    "building_count": 1,
-    "total_sqft": 4594,
-    "residential_count": 1,
-    "residential_pct": 1.0,
-    "size_eligible_count": 0,
-    "building_density": 0.0,
-    "priority_score": 0.3,
-    "centroid_lat": 0.0,
-    "centroid_lng": 0.0
-  },
-  {
     "Settlement": "Breslau",
     "avg_coverage": 4.3512,
     "max_coverage": 14.77,
@@ -166,20 +152,6 @@
     "priority_score": 0.335,
     "centroid_lat": 43.529361,
     "centroid_lng": -80.742808
-  },
-  {
-    "Settlement": 0,
-    "avg_coverage": 0.0,
-    "max_coverage": 0.0,
-    "building_count": 8,
-    "total_sqft": 10566,
-    "residential_count": 7,
-    "residential_pct": 0.875,
-    "size_eligible_count": 0,
-    "building_density": 0.0,
-    "priority_score": 0.2625,
-    "centroid_lat": 0.0,
-    "centroid_lng": 0.0
   },
   {
     "Settlement": "Elmira",
@@ -474,20 +446,6 @@
     "priority_score": 0.5314,
     "centroid_lat": 43.535098,
     "centroid_lng": -80.552682
-  },
-  {
-    "Settlement": "Unknown",
-    "avg_coverage": 0.0003,
-    "max_coverage": 0.54,
-    "building_count": 0,
-    "total_sqft": 0,
-    "residential_count": 0,
-    "residential_pct": 0.0,
-    "size_eligible_count": 0,
-    "building_density": 0.0,
-    "priority_score": 0.0,
-    "centroid_lat": 0.0,
-    "centroid_lng": 0.0
   },
   {
     "Settlement": "Wallenstein",

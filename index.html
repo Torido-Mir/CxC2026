@@ -4,293 +4,98 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Urban Heat Island Map – Waterloo Region</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; }
-    #map { width: 100%; height: 100vh; }
-    .panel {
-      position: absolute;
-      top: 16px;
-      left: 16px;
-      width: 280px;
-      max-height: 90vh;
-      overflow-y: auto;
-      background: white;
-      padding: 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-      z-index: 1000;
-    }
-    .panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #333; }
-    .panel label { display: block; font-size: 11px; color: #666; margin-bottom: 4px; }
-    .panel input[type="range"] { width: 100%; margin-bottom: 12px; }
-    .panel input[type="number"] { width: 100%; padding: 6px 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; }
-    .panel .range-labels { display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-top: -8px; margin-bottom: 12px; }
-    .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
-    .search-row input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-    .search-row button { padding: 8px 12px; background: #2166ac; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-    .search-row button:hover { background: #1a5490; }
-    .btn { display: block; width: 100%; padding: 8px 12px; margin-bottom: 8px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-    .btn:hover { background: #333; }
-    .btn.active { background: #2166ac; }
-    .btn.secondary { background: #666; }
-    .view-btns { display: flex; gap: 8px; margin-bottom: 12px; }
-    .view-btns .btn { flex: 1; margin-bottom: 0; }
-    .legend {
-      position: absolute;
-      bottom: 24px;
-      left: 16px;
-      background: white;
-      padding: 12px 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      z-index: 1000;
-    }
-    .legend h3 { font-size: 12px; font-weight: 600; margin-bottom: 8px; color: #333; }
-    .legend-scale { display: flex; gap: 4px; height: 12px; margin-bottom: 4px; }
-    .legend-scale span { width: 24px; height: 12px; border-radius: 2px; }
-    .legend-labels { display: flex; justify-content: space-between; font-size: 10px; color: #666; }
-    .legend p.hint { font-size: 10px; color: #888; margin-top: 6px; }
-    .detail-panel {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      width: 260px;
-      background: white;
-      padding: 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-      z-index: 1000;
-      display: none;
-    }
-    .detail-panel.visible { display: block; }
-    .detail-panel h4 { font-size: 13px; margin-bottom: 10px; color: #333; }
-    .detail-panel .stat { font-size: 12px; margin-bottom: 6px; color: #555; }
-    .detail-panel .stat strong { color: #222; }
-    .detail-panel .close { float: right; cursor: pointer; font-size: 18px; color: #999; }
-    .detail-panel .close:hover { color: #333; }
-    .detail-panel .area-stats { margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee; font-size: 12px; }
-
-    /* ── Chat Panel ─────────────────────────────────────── */
-    .chat-toggle {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: #2166ac;
-      color: white;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-      z-index: 1100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-    }
-    .chat-toggle:hover { background: #1a5490; }
-    .chat-toggle.open { background: #d6604d; }
-
-    .chat-panel {
-      position: fixed;
-      bottom: 88px;
-      right: 24px;
-      width: 380px;
-      max-height: 520px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-      z-index: 1100;
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .chat-panel.visible { display: flex; }
-
-    .chat-header {
-      padding: 12px 16px;
-      background: #2166ac;
-      color: white;
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .chat-header .chat-new {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: white;
-      padding: 4px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .chat-header .chat-new:hover { background: rgba(255,255,255,0.35); }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      min-height: 280px;
-      max-height: 380px;
-    }
-
-    .chat-msg {
-      max-width: 85%;
-      padding: 8px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      line-height: 1.45;
-      word-wrap: break-word;
-    }
-    .chat-msg.user {
-      align-self: flex-end;
-      background: #2166ac;
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
-    .chat-msg.assistant {
-      align-self: flex-start;
-      background: #f0f0f0;
-      color: #222;
-      border-bottom-left-radius: 4px;
-    }
-    .chat-msg.assistant strong { color: #2166ac; }
-    .chat-msg.system {
-      align-self: center;
-      background: transparent;
-      color: #999;
-      font-size: 11px;
-      font-style: italic;
-    }
-    .chat-msg.assistant .action-tag {
-      display: inline-block;
-      background: #e3eef7;
-      color: #2166ac;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      margin-top: 4px;
-      margin-right: 4px;
-    }
-
-    .chat-input-row {
-      display: flex;
-      gap: 8px;
-      padding: 10px 12px;
-      border-top: 1px solid #eee;
-      background: #fafafa;
-    }
-    .chat-input-row input {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      font-size: 13px;
-      outline: none;
-    }
-    .chat-input-row input:focus { border-color: #2166ac; }
-    .chat-input-row button {
-      padding: 8px 16px;
-      background: #2166ac;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .chat-input-row button:hover { background: #1a5490; }
-    .chat-input-row button:disabled { background: #aaa; cursor: not-allowed; }
-
-    .chat-typing {
-      padding: 4px 16px 8px;
-      font-size: 11px;
-      color: #999;
-      font-style: italic;
-      display: none;
-    }
-    .chat-typing.visible { display: block; }
-  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+  <!-- ── Map ──────────────────────────────────────────── -->
   <div id="map"></div>
 
+  <!-- ── Filter Panel ─────────────────────────────────── -->
   <div class="panel">
-    <h3>Filters & Tools</h3>
+    <h3>Filters &amp; Tools</h3>
+
     <label>Min coverage % (show hotter areas)</label>
     <input type="range" id="covMin" min="0.1" max="60" value="0.1" step="0.1">
     <div class="range-labels"><span id="covMinVal">0.1</span>%</div>
+
     <label>Min buildings per cell</label>
     <input type="range" id="minBuildings" min="0" max="50" value="0">
     <div class="range-labels"><span id="minBuildingsVal">0</span></div>
+
     <label>Neighborhood</label>
-    <select id="neighborhood" style="width:100%;padding:6px 8px;margin-bottom:12px;border:1px solid #ccc;border-radius:4px;">
+    <select id="neighborhood">
       <option value="">All</option>
     </select>
-    <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+
+    <label class="checkbox-label">
       <input type="checkbox" id="sizeEligibleOnly"> Size-eligible only (&lt; 600 m²)
     </label>
+
     <label>Building type</label>
-    <select id="buildingType" style="width:100%;padding:6px 8px;margin-bottom:12px;border:1px solid #ccc;border-radius:4px;">
+    <select id="buildingType">
       <option value="">All</option>
       <option value="Residential">Residential</option>
       <option value="Commercial">Commercial</option>
       <option value="Agricultural">Agricultural</option>
       <option value="Utility and Miscellaneous">Utility and Miscellaneous</option>
     </select>
+
     <label>Storey tier</label>
-    <select id="storeyTier" style="width:100%;padding:6px 8px;margin-bottom:12px;border:1px solid #ccc;border-radius:4px;">
+    <select id="storeyTier">
       <option value="">All</option>
       <option value="low">Low (1–2)</option>
       <option value="mid">Mid (3–6)</option>
       <option value="high">High (7+)</option>
     </select>
-    <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+
+    <label class="checkbox-label">
       <input type="checkbox" id="showBuildings"> Show building points
     </label>
+
     <div class="search-row">
       <input type="text" id="searchInput" placeholder="Search address or place...">
       <button id="searchBtn">Go</button>
     </div>
+
     <label>View</label>
     <div class="view-btns">
       <button class="btn active" id="viewHeatBtn">Heatmap</button>
       <button class="btn secondary" id="viewGridBtn">Grid</button>
     </div>
+
     <button class="btn" id="drawAreaBtn">Draw area to analyze</button>
     <button class="btn secondary" id="exportBtn">Export filtered buildings</button>
     <button class="btn secondary" id="resetBtn">Reset view</button>
   </div>
 
+  <!-- ── Legend ────────────────────────────────────────── -->
   <div class="legend">
     <h3>Urban heat intensity</h3>
     <div class="legend-scale">
-      <span style="background:#2166ac"></span><span style="background:#4393c3"></span>
-      <span style="background:#92c5de"></span><span style="background:#d1e5f0"></span>
-      <span style="background:#f7f7f7"></span><span style="background:#fddbc7"></span>
-      <span style="background:#f4a582"></span><span style="background:#d6604d"></span>
+      <span style="background:#2166ac"></span>
+      <span style="background:#4393c3"></span>
+      <span style="background:#92c5de"></span>
+      <span style="background:#d1e5f0"></span>
+      <span style="background:#f7f7f7"></span>
+      <span style="background:#fddbc7"></span>
+      <span style="background:#f4a582"></span>
+      <span style="background:#d6604d"></span>
       <span style="background:#b2182b"></span>
     </div>
-    <div class="legend-labels"><span>Cool</span><span>Hot</span></div>
+    <div class="legend-labels"><span>Sparse</span><span>Dense</span></div>
     <p class="hint">Click map for cell stats</p>
   </div>
 
+  <!-- ── Detail Panel ─────────────────────────────────── -->
   <div class="detail-panel" id="detailPanel">
     <span class="close" id="closeDetail">&times;</span>
     <h4>Cell / Area Stats</h4>
     <div id="detailContent"></div>
   </div>
 
-  <!-- Chat UI -->
+  <!-- ── Chat UI ──────────────────────────────────────── -->
   <button class="chat-toggle" id="chatToggle" title="Grant Advisor Chat">&#128172;</button>
   <div class="chat-panel" id="chatPanel">
     <div class="chat-header">
@@ -307,462 +112,11 @@
     </div>
   </div>
 
+  <!-- ── Scripts ──────────────────────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
-  <script>
-    const map = L.map('map').setView([43.42, -80.38], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
+  <script src="app.js"></script>
 
-    let rawFeatures = [];
-    let buildingsData = [];
-    let neighborhoodStats = [];
-    let gridLayer = null;
-    let heatLayer = null;
-    let buildingsLayer = null;
-    let viewMode = 'heat';
-    let drawRect = null;
-    let drawMode = false;
-    let drawStart = null;
-    let maxCoverage = 60;
-
-    function getCentroid(feature) {
-      const ring = feature.geometry.coordinates[0];
-      let sx = 0, sy = 0, n = ring.length - 1;
-      for (let i = 0; i < n; i++) { sx += ring[i][0]; sy += ring[i][1]; }
-      return [sy / n, sx / n];
-    }
-
-    function pointInPolygon(lat, lng, feature) {
-      const ring = feature.geometry.coordinates[0];
-      const x = lng, y = lat;
-      let inside = false;
-      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-        const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
-        if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside;
-      }
-      return inside;
-    }
-
-    function getColor(pct) {
-      const stops = [[0,'#2166ac'],[12.5,'#4393c3'],[25,'#92c5de'],[37.5,'#d1e5f0'],[50,'#f7f7f7'],[62.5,'#fddbc7'],[75,'#f4a582'],[87.5,'#d6604d'],[100,'#b2182b']];
-      for (let i = 0; i < stops.length - 1; i++) if (pct <= stops[i+1][0]) return stops[i][1];
-      return stops[stops.length-1][1];
-    }
-
-    function style(feature) {
-      const pct = feature.properties.coverage_pct || 0;
-      return { fillColor: getColor(pct), fillOpacity: 0.65, weight: 0.5, color: '#fff' };
-    }
-
-    function getFilteredFeatures() {
-      const covMin = +document.getElementById('covMin').value;
-      const minB = +document.getElementById('minBuildings').value;
-      const settlement = document.getElementById('neighborhood').value;
-      return rawFeatures.filter(f => {
-        const p = f.properties;
-        if (p.coverage_pct < covMin || p.building_count < minB) return false;
-        if (settlement && (p.settlement || p.Settlement) !== settlement) return false;
-        return true;
-      });
-    }
-
-    function getFilteredBuildings() {
-      const settlement = document.getElementById('neighborhood').value;
-      const sizeOnly = document.getElementById('sizeEligibleOnly').checked;
-      const btype = document.getElementById('buildingType').value;
-      const storey = document.getElementById('storeyTier').value;
-      return buildingsData.filter(b => {
-        const p = b.properties || {};
-        if (settlement && p.Settlement !== settlement) return false;
-        if (sizeOnly && !p.size_eligible) return false;
-        if (btype && p.BuildingType !== btype) return false;
-        if (storey && p.storey_category !== storey) return false;
-        return true;
-      });
-    }
-
-    function applyFilters() {
-      const filtered = getFilteredFeatures();
-      if (viewMode === 'heat') {
-        if (gridLayer) { map.removeLayer(gridLayer); gridLayer = null; }
-        const points = filtered.map(f => {
-          const [lat, lng] = getCentroid(f);
-          const intensity = Math.min(1, (f.properties.coverage_pct || 0) / maxCoverage);
-          return [lat, lng, intensity];
-        });
-        if (heatLayer) map.removeLayer(heatLayer);
-        heatLayer = L.heatLayer(points, {
-          radius: 35, blur: 28, maxZoom: 17, minOpacity: 0.35, max: 1,
-          gradient: { 0.0: '#2166ac', 0.2: '#4393c3', 0.4: '#92c5de', 0.5: '#d1e5f0', 0.6: '#f7f7f7', 0.7: '#fddbc7', 0.8: '#f4a582', 0.9: '#d6604d', 1.0: '#b2182b' }
-        }).addTo(map);
-      } else {
-        if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
-        const filteredGeoJSON = { type: 'FeatureCollection', features: filtered };
-        if (gridLayer) map.removeLayer(gridLayer);
-        gridLayer = L.geoJSON(filteredGeoJSON, {
-          style,
-          onEachFeature: (feature, layer) => {
-            layer.bindTooltip(`<b>${feature.properties.coverage_pct.toFixed(1)}%</b> coverage · ${feature.properties.building_count} buildings`, { sticky: true });
-            layer.on('click', () => showDetail(feature, null));
-          }
-        }).addTo(map);
-      }
-      applyBuildingsLayer();
-    }
-
-    function applyBuildingsLayer() {
-      if (buildingsLayer) { map.removeLayer(buildingsLayer); buildingsLayer = null; }
-      if (!document.getElementById('showBuildings').checked || !buildingsData.length) return;
-      const filtered = getFilteredBuildings();
-      const geo = { type: 'FeatureCollection', features: filtered };
-      buildingsLayer = L.geoJSON(geo, {
-        pointToLayer: (f, latlng) => L.circleMarker(latlng, { radius: 3, fillColor: f.properties.size_eligible ? '#22a722' : '#c44', color: '#fff', weight: 0.5, fillOpacity: 0.7 }),
-        onEachFeature: (feature, layer) => {
-          const p = feature.properties;
-          layer.bindTooltip(`<b>${p.TotalSqft || p.FootprintSqft} sqft</b> · ${p.Storeys} storeys · ${p.size_eligible ? 'Eligible' : 'Over cap'} · SVR ${(p.svr_proxy || 0).toFixed(2)}`, { sticky: true });
-        }
-      }).addTo(map);
-    }
-
-    function showDetail(feature, bounds) {
-      const panel = document.getElementById('detailPanel');
-      const content = document.getElementById('detailContent');
-      panel.querySelector('h4').textContent = 'Cell / Area Stats';
-      if (bounds) {
-        const filtered = getFilteredFeatures();
-        const inBounds = filtered.filter(f => {
-          const c = f.geometry.coordinates[0];
-          const lngs = c.map(p => p[0]), lats = c.map(p => p[1]);
-          const cx = (Math.min(...lngs) + Math.max(...lngs)) / 2;
-          const cy = (Math.min(...lats) + Math.max(...lats)) / 2;
-          return cx >= bounds.getWest() && cx <= bounds.getEast() && cy >= bounds.getSouth() && cy <= bounds.getNorth();
-        });
-        const tot = inBounds.length;
-        const avg = tot ? inBounds.reduce((s,f) => s + f.properties.coverage_pct, 0) / tot : 0;
-        const buildings = inBounds.reduce((s,f) => s + f.properties.building_count, 0);
-        content.innerHTML = `<div class="area-stats"><div class="stat">Cells: <strong>${tot}</strong></div><div class="stat">Avg coverage: <strong>${avg.toFixed(1)}%</strong></div><div class="stat">Total buildings: <strong>${buildings}</strong></div></div>`;
-      } else {
-        const p = feature.properties;
-        content.innerHTML = `<div class="stat">Coverage: <strong>${p.coverage_pct.toFixed(1)}%</strong></div><div class="stat">Buildings: <strong>${p.building_count}</strong></div>`;
-      }
-      panel.classList.add('visible');
-    }
-
-    function onMapClick(e) {
-      if (viewMode !== 'heat' || drawMode) return;
-      const { lat, lng } = e.latlng;
-      const cell = getFilteredFeatures().find(f => pointInPolygon(lat, lng, f));
-      if (cell) showDetail(cell, null);
-    }
-
-    document.getElementById('covMin').oninput = function() {
-      document.getElementById('covMinVal').textContent = this.value;
-      applyFilters();
-    };
-    document.getElementById('minBuildings').oninput = function() {
-      document.getElementById('minBuildingsVal').textContent = this.value;
-      applyFilters();
-    };
-    document.getElementById('neighborhood').onchange = function() {
-      applyFilters();
-      const s = document.getElementById('neighborhood').value;
-      if (s && neighborhoodStats.length) {
-        const ns = neighborhoodStats.find(n => n.Settlement === s);
-        if (ns) {
-          document.getElementById('detailPanel').querySelector('h4').textContent = 'Neighborhood Stats';
-          document.getElementById('detailContent').innerHTML = `<div class="area-stats"><div class="stat">Buildings: <strong>${ns.building_count}</strong></div><div class="stat">Size-eligible: <strong>${ns.size_eligible_count}</strong></div><div class="stat">Avg coverage: <strong>${ns.avg_coverage.toFixed(1)}%</strong></div><div class="stat">Priority score: <strong>${ns.priority_score.toFixed(2)}</strong></div></div>`;
-          document.getElementById('detailPanel').classList.add('visible');
-        }
-      } else {
-        document.getElementById('detailPanel').querySelector('h4').textContent = 'Cell / Area Stats';
-        document.getElementById('detailPanel').classList.remove('visible');
-      }
-    };
-    document.getElementById('sizeEligibleOnly').onchange = applyFilters;
-    document.getElementById('buildingType').onchange = applyFilters;
-    document.getElementById('storeyTier').onchange = applyFilters;
-    document.getElementById('showBuildings').onchange = applyFilters;
-
-    document.getElementById('exportBtn').onclick = function() {
-      const filtered = getFilteredBuildings();
-      if (!filtered.length) { alert('No buildings to export. Enable "Show building points" and apply filters.'); return; }
-      const headers = ['OBJECTID','Municipality','Settlement','FootprintSqft','Storeys','TotalSqft','BuildingType','size_eligible','storey_category','svr_proxy'];
-      const rows = filtered.map(f => {
-        const p = f.properties || {};
-        return headers.map(h => (p[h] != null ? p[h] : '')).join(',');
-      });
-      const csv = headers.join(',') + '\n' + rows.join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'filtered_buildings.csv';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    };
-
-    document.getElementById('searchBtn').onclick = async () => {
-      const q = document.getElementById('searchInput').value.trim();
-      if (!q) return;
-      try {
-        const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ', Waterloo Ontario')}&limit=1`);
-        const data = await r.json();
-        if (data[0]) {
-          map.flyTo([parseFloat(data[0].lat), parseFloat(data[0].lon)], 14);
-          L.marker([data[0].lat, data[0].lon]).addTo(map).bindPopup(data[0].display_name).openPopup();
-        }
-      } catch (e) { alert('Search failed.'); }
-    };
-
-    document.getElementById('viewHeatBtn').onclick = () => {
-      viewMode = 'heat';
-      document.getElementById('viewHeatBtn').classList.add('active'); document.getElementById('viewHeatBtn').classList.remove('secondary');
-      document.getElementById('viewGridBtn').classList.remove('active'); document.getElementById('viewGridBtn').classList.add('secondary');
-      applyFilters();
-    };
-    document.getElementById('viewGridBtn').onclick = () => {
-      viewMode = 'grid';
-      document.getElementById('viewGridBtn').classList.add('active'); document.getElementById('viewGridBtn').classList.remove('secondary');
-      document.getElementById('viewHeatBtn').classList.remove('active'); document.getElementById('viewHeatBtn').classList.add('secondary');
-      applyFilters();
-    };
-
-    document.getElementById('drawAreaBtn').onclick = function() {
-      drawMode = !drawMode;
-      this.classList.toggle('active', drawMode);
-      if (drawMode) {
-        map.dragging.disable();
-        map.on('mousedown', onDrawStart);
-      } else {
-        map.dragging.enable();
-        map.off('mousedown', onDrawStart);
-        map.off('mousemove', onDrawMove);
-        map.off('mouseup', onDrawEnd);
-        if (drawRect) { map.removeLayer(drawRect); drawRect = null; }
-      }
-    };
-
-    function onDrawStart(e) {
-      drawStart = e.latlng;
-      drawRect = L.rectangle([drawStart, drawStart], { color: '#2166ac', weight: 2, fillOpacity: 0.1 }).addTo(map);
-      map.on('mousemove', onDrawMove);
-      map.on('mouseup', onDrawEnd);
-    }
-    function onDrawMove(e) {
-      if (drawRect && drawStart) drawRect.setBounds([drawStart, e.latlng]);
-    }
-    function onDrawEnd(e) {
-      map.off('mousedown', onDrawStart);
-      map.off('mousemove', onDrawMove);
-      map.off('mouseup', onDrawEnd);
-      if (drawRect && drawStart) {
-        const b = drawRect.getBounds();
-        showDetail(null, b);
-        document.getElementById('drawAreaBtn').classList.remove('active');
-        drawMode = false;
-        map.dragging.enable();
-        setTimeout(() => { if (drawRect) { map.removeLayer(drawRect); drawRect = null; } }, 3000);
-      }
-      drawStart = null;
-    }
-
-    document.getElementById('closeDetail').onclick = () => document.getElementById('detailPanel').classList.remove('visible');
-    document.getElementById('resetBtn').onclick = () => {
-      document.getElementById('covMin').value = 0.1;
-      document.getElementById('minBuildings').value = 0;
-      document.getElementById('minBuildingsVal').textContent = '0';
-      document.getElementById('neighborhood').value = '';
-      document.getElementById('sizeEligibleOnly').checked = false;
-      document.getElementById('buildingType').value = '';
-      document.getElementById('storeyTier').value = '';
-      document.getElementById('covMin').value = 0.1;
-      document.getElementById('covMinVal').textContent = '0.1';
-      document.getElementById('detailPanel').classList.remove('visible');
-      applyFilters();
-      map.flyTo([43.42, -80.38], 10);
-    };
-
-    map.on('click', onMapClick);
-
-    Promise.all([
-      fetch('uhi_grid.geojson').then(r => r.json()),
-      fetch('neighborhood_stats.json').then(r => r.json()).catch(() => []),
-      fetch('buildings_enriched_sample.json').then(r => r.json()).catch(() => ({ features: [] }))
-    ]).then(([geojson, stats, buildingsGeo]) => {
-      rawFeatures = geojson.features;
-      neighborhoodStats = stats;
-      buildingsData = buildingsGeo.features || [];
-      maxCoverage = Math.max(55, Math.ceil(Math.max(...rawFeatures.map(f => f.properties.coverage_pct))) || 60);
-      document.getElementById('covMin').max = maxCoverage;
-      const maxBuildings = Math.min(100, Math.ceil(Math.max(...rawFeatures.map(f => f.properties.building_count || 0))) || 50);
-      document.getElementById('minBuildings').max = maxBuildings;
-      neighborhoodStats.forEach(n => {
-        const opt = document.createElement('option');
-        opt.value = n.Settlement;
-        opt.textContent = n.Settlement;
-        document.getElementById('neighborhood').appendChild(opt);
-      });
-      applyFilters();
-    }).catch(err => {
-      document.body.insertAdjacentHTML('beforeend', '<p style="position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#c00;color:#fff;padding:8px 16px;border-radius:8px;z-index:9999;">Run compute_uhi.py, build_building_scores.py, build_neighborhood_stats.py, enrich_uhi_grid.py, then serve (python -m http.server 8000)</p>');
-      console.error(err);
-    });
-
-    // ── Chat + Map Action Bridge ──────────────────────────
-    const CHAT_API = 'http://localhost:8001';
-    let chatThreadId = null;
-
-    const chatToggle = document.getElementById('chatToggle');
-    const chatPanel = document.getElementById('chatPanel');
-    const chatMessages = document.getElementById('chatMessages');
-    const chatInput = document.getElementById('chatInput');
-    const chatSendBtn = document.getElementById('chatSendBtn');
-    const chatNewBtn = document.getElementById('chatNewBtn');
-    const chatTyping = document.getElementById('chatTyping');
-
-    chatToggle.onclick = () => {
-      chatPanel.classList.toggle('visible');
-      chatToggle.classList.toggle('open');
-      if (chatPanel.classList.contains('visible')) chatInput.focus();
-    };
-
-    chatNewBtn.onclick = () => {
-      chatThreadId = null;
-      chatMessages.innerHTML = '<div class="chat-msg system">New conversation started. Ask me anything!</div>';
-    };
-
-    function addChatMsg(role, text, actions) {
-      const div = document.createElement('div');
-      div.className = `chat-msg ${role}`;
-
-      // Simple markdown-ish rendering for assistant
-      if (role === 'assistant') {
-        let html = text
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\n- /g, '<br>• ')
-          .replace(/\n\d+\.\s/g, (m) => '<br>' + m.trim() + ' ')
-          .replace(/\n/g, '<br>');
-        if (actions && actions.length) {
-          html += '<br>';
-          actions.forEach(a => {
-            const label = a.type.replace(/_/g, ' ');
-            const detail = a.settlement || a.building_type || '';
-            html += `<span class="action-tag">${label}${detail ? ': ' + detail : ''}</span>`;
-          });
-        }
-        div.innerHTML = html;
-      } else {
-        div.textContent = text;
-      }
-
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function getMapState() {
-      return {
-        settlement: document.getElementById('neighborhood').value,
-        size_eligible_only: document.getElementById('sizeEligibleOnly').checked,
-        building_type: document.getElementById('buildingType').value,
-        storey_tier: document.getElementById('storeyTier').value,
-        min_coverage: parseFloat(document.getElementById('covMin').value),
-        show_buildings: document.getElementById('showBuildings').checked,
-      };
-    }
-
-    // ── Map action executor ──
-    function executeActions(actions) {
-      if (!actions || !actions.length) return;
-      actions.forEach(action => {
-        switch (action.type) {
-          case 'highlight_settlement': {
-            const sel = document.getElementById('neighborhood');
-            const opt = Array.from(sel.options).find(o => o.value === action.settlement);
-            if (opt) {
-              sel.value = action.settlement;
-              sel.dispatchEvent(new Event('change'));
-            }
-            break;
-          }
-          case 'zoom_to_settlement': {
-            const ns = neighborhoodStats.find(n => n.Settlement === action.settlement);
-            if (ns && ns.centroid_lat && ns.centroid_lng) {
-              map.flyTo([ns.centroid_lat, ns.centroid_lng], 13);
-            } else {
-              // Fallback: highlight it which triggers the filter
-              const sel = document.getElementById('neighborhood');
-              sel.value = action.settlement;
-              sel.dispatchEvent(new Event('change'));
-            }
-            break;
-          }
-          case 'apply_filters': {
-            if (action.size_eligible_only !== undefined && action.size_eligible_only !== null) {
-              document.getElementById('sizeEligibleOnly').checked = action.size_eligible_only;
-            }
-            if (action.building_type !== undefined && action.building_type !== null) {
-              document.getElementById('buildingType').value = action.building_type;
-            }
-            if (action.storey_tier !== undefined && action.storey_tier !== null) {
-              document.getElementById('storeyTier').value = action.storey_tier;
-            }
-            if (action.min_coverage !== undefined && action.min_coverage !== null) {
-              document.getElementById('covMin').value = action.min_coverage;
-              document.getElementById('covMinVal').textContent = action.min_coverage;
-            }
-            applyFilters();
-            break;
-          }
-          case 'show_building_points': {
-            document.getElementById('showBuildings').checked = !!action.visible;
-            applyFilters();
-            break;
-          }
-        }
-      });
-    }
-
-    async function sendChatMessage() {
-      const text = chatInput.value.trim();
-      if (!text) return;
-
-      addChatMsg('user', text);
-      chatInput.value = '';
-      chatSendBtn.disabled = true;
-      chatTyping.classList.add('visible');
-
-      try {
-        const resp = await fetch(`${CHAT_API}/chat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: text,
-            thread_id: chatThreadId,
-            map_state: getMapState(),
-          }),
-        });
-
-        if (!resp.ok) {
-          const err = await resp.json().catch(() => ({ detail: 'Unknown error' }));
-          throw new Error(err.detail || `HTTP ${resp.status}`);
-        }
-
-        const data = await resp.json();
-        chatThreadId = data.thread_id;
-        addChatMsg('assistant', data.message, data.actions);
-        executeActions(data.actions);
-      } catch (err) {
-        addChatMsg('system', `Error: ${err.message}. Is the backend running? (uvicorn chat_backend:app --port 8001)`);
-        console.error('Chat error:', err);
-      } finally {
-        chatSendBtn.disabled = false;
-        chatTyping.classList.remove('visible');
-      }
-    }
-
-    chatSendBtn.onclick = sendChatMessage;
-    chatInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
-    });
-  </script>
 </body>
 </html>

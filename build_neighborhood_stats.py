@@ -149,6 +149,17 @@ def main():
         ]
     ].copy()
     out = out.rename(columns={"settlement": "Settlement"})
+
+    # Drop invalid / empty settlements
+    out["Settlement"] = out["Settlement"].astype(str).str.strip()
+    out = out[
+        (out["Settlement"] != "")
+        & (out["Settlement"] != "0")
+        & (out["Settlement"].str.lower() != "unknown")
+        & (out["Settlement"].str.lower() != "nan")
+        & (out["building_count"] > 0)
+    ].copy()
+
     out = out.fillna(0)
     for col in ["avg_coverage", "max_coverage", "building_density", "priority_score", "residential_pct"]:
         out[col] = out[col].round(4)
