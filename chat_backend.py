@@ -214,10 +214,19 @@ async def chat(req: ChatRequest):
     has_show_buildings = "show_building_points" in action_types
     has_apply_filters = "apply_filters" in action_types
 
+    # User wants to see ALL buildings (include ineligible) — turn OFF the filter
+    broaden_keywords = {"ineligible", "all buildings", "show all", "include ineligible", "as well", "both eligible and", "eligible and ineligible"}
+    wants_to_show_all = any(kw in msg_lower for kw in broaden_keywords)
+
+    # User wants eligible-only — turn ON the filter (exclude "ineligible" from triggering this)
     eligibility_keywords = {"eligible", "grant", "qualify", "qualifying", "eligib", "size_eligible"}
     mentions_eligibility = any(kw in msg_lower for kw in eligibility_keywords)
+    wants_eligible_only = mentions_eligibility and "ineligible" not in msg_lower
 
-    if has_show_buildings and not has_apply_filters and mentions_eligibility:
+    if wants_to_show_all:
+        logger.info("Auto-injecting apply_filters(size_eligible_only=false) for show-all/ineligible query")
+        actions.append(ChatAction(type="apply_filters", size_eligible_only=False))
+    elif has_show_buildings and not has_apply_filters and wants_eligible_only:
         logger.info("Auto-injecting apply_filters(size_eligible_only=true) for eligibility query")
         actions.append(ChatAction(type="apply_filters", size_eligible_only=True))
 
