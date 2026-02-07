@@ -23,10 +23,10 @@ const MAP_ZOOM   = 10;
 const CHAT_API   = 'http://localhost:8001';
 
 const HEAT_OPTS = {
-  radius: 35, blur: 28, maxZoom: 17, minOpacity: 0.35, max: 1,
+  radius: 35, blur: 28, maxZoom: 13, minOpacity: 0.35, max: 1,
   gradient: {
     0.0: '#2166ac', 0.2: '#4393c3', 0.4: '#92c5de', 0.5: '#d1e5f0',
-    0.6: '#f7f7f7', 0.7: '#fddbc7', 0.8: '#f4a582', 0.9: '#d6604d', 1.0: '#b2182b'
+    0.6: '#f7f7f7', 0.7: '#fddbc7', 0.8: '#f4a582', 0.9: '#e08870', 1.0: '#d6604d'
   }
 };
 
@@ -43,6 +43,7 @@ const COLOR_STOPS = [
 ];
 
 const GAMMA = 0.30; // power curve — lower = red grows faster in denser areas
+const AUTO_GRID_ZOOM = 13; // zoom level at which we auto-switch from heatmap to grid
 
 const CSV_HEADERS = [
   'OBJECTID','Municipality','Settlement','FootprintSqft','Storeys',
@@ -66,6 +67,7 @@ const dom = {
   searchBtn:       $('searchBtn'),
   viewHeatBtn:     $('viewHeatBtn'),
   viewGridBtn:     $('viewGridBtn'),
+  viewOffBtn:      $('viewOffBtn'),
   drawAreaBtn:     $('drawAreaBtn'),
   exportBtn:       $('exportBtn'),
   resetBtn:        $('resetBtn'),
@@ -93,6 +95,8 @@ let drawRect          = null;
 let drawMode          = false;
 let drawStart         = null;
 let maxCoverage       = 60;
+let userLockedView    = false;
+let searchMarker      = null;
 let chatThreadId      = null;
 
 // ── 4. Map Initialisation ─────────────────────────────────
@@ -235,7 +239,10 @@ function applyBuildingsLayer() {
 
 function applyFilters() {
   const filtered = getFilteredFeatures();
-  if (viewMode === 'heat') {
+  if (viewMode === 'off') {
+    heatLayer = removeLayer(heatLayer);
+    gridLayer = removeLayer(gridLayer);
+  } else if (viewMode === 'heat') {
     renderHeatmap(filtered);
   } else {
     renderGrid(filtered);
@@ -323,7 +330,7 @@ dom.showBuildings.onchange    = applyFilters;
 dom.exportBtn.onclick = function () {
   const filtered = getFilteredBuildings();
   if (!filtered.length) {
-    alert('No buildings to export. Enable "Show building points" and apply filters.');
+    showToast('No buildings to export — enable "Show building points" and apply filters.', 'warning');
     return;
   }
   const rows = filtered.map(f => {
@@ -339,38 +346,100 @@ dom.exportBtn.onclick = function () {
   URL.revokeObjectURL(a.href);
 };
 
-dom.searchBtn.onclick = async () => {
+// ── Toast Notification Helper ─────────────────────────────
+function showToast(message, type = '', duration = 3000) {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = message;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('visible'));
+  setTimeout(() => {
+    el.classList.remove('visible');
+    setTimeout(() => el.remove(), 300);
+  }, duration);
+}
+
+// Waterloo Region bounding box (SW → NE)
+const SEARCH_VIEWBOX = '-80.75,43.25,-80.20,43.60';
+
+async function doSearch() {
   const q = dom.searchInput.value.trim();
   if (!q) return;
   try {
-    const url  = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ', Waterloo Ontario')}&limit=1`;
-    const data = await fetch(url).then(r => r.json());
-    if (data[0]) {
-      map.flyTo([parseFloat(data[0].lat), parseFloat(data[0].lon)], 14);
-      L.marker([data[0].lat, data[0].lon]).addTo(map).bindPopup(data[0].display_name).openPopup();
+    const params = new URLSearchParams({
+      format: 'json',
+      q: q + ', Waterloo Ontario',
+      limit: '1',
+      viewbox: SEARCH_VIEWBOX,
+      bounded: '1',
+    });
+    const data = await fetch(`https://nominatim.openstreetmap.org/search?${params}`).then(r => r.json());
+    if (!data.length) {
+      // Retry without bounding box in case the query is just outside the region
+      params.delete('bounded');
+      const fallback = await fetch(`https://nominatim.openstreetmap.org/search?${params}`).then(r => r.json());
+      if (!fallback.length) { showToast('No results found — try a different address or place name.', 'warning'); return; }
+      data.push(fallback[0]);
     }
-  } catch { alert('Search failed.'); }
-};
+    // Clear previous search marker
+    if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
+    const lat = parseFloat(data[0].lat);
+    const lon = parseFloat(data[0].lon);
+    map.flyTo([lat, lon], 14);
+    searchMarker = L.marker([lat, lon]).addTo(map).bindPopup(data[0].display_name).openPopup();
+  } catch { showToast('Search failed — please try again.', 'error'); }
+}
+
+dom.searchBtn.onclick = doSearch;
+dom.searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
+});
 
 // ── 11. View Toggle & Draw Tool ───────────────────────────
-function setActiveBtn(active, inactive) {
-  active.classList.add('active');
-  active.classList.remove('secondary');
-  inactive.classList.remove('active');
-  inactive.classList.add('secondary');
+function setActiveViewBtn(activeBtn) {
+  [dom.viewHeatBtn, dom.viewGridBtn, dom.viewOffBtn].forEach(btn => {
+    btn.classList.remove('active');
+    btn.classList.add('secondary');
+  });
+  activeBtn.classList.add('active');
+  activeBtn.classList.remove('secondary');
 }
 
 dom.viewHeatBtn.onclick = () => {
+  userLockedView = false;  // re-enable auto-switch (heatmap is the default auto mode)
   viewMode = 'heat';
-  setActiveBtn(dom.viewHeatBtn, dom.viewGridBtn);
+  setActiveViewBtn(dom.viewHeatBtn);
   applyFilters();
 };
 
 dom.viewGridBtn.onclick = () => {
+  userLockedView = true;
   viewMode = 'grid';
-  setActiveBtn(dom.viewGridBtn, dom.viewHeatBtn);
+  setActiveViewBtn(dom.viewGridBtn);
   applyFilters();
 };
+
+dom.viewOffBtn.onclick = () => {
+  userLockedView = true;
+  viewMode = 'off';
+  setActiveViewBtn(dom.viewOffBtn);
+  applyFilters();
+};
+
+// ── Auto-switch view based on zoom level ──
+map.on('zoomend', () => {
+  if (userLockedView) return;
+  const z = map.getZoom();
+  if (z >= AUTO_GRID_ZOOM && viewMode !== 'grid') {
+    viewMode = 'grid';
+    setActiveViewBtn(dom.viewGridBtn);
+    applyFilters();
+  } else if (z < AUTO_GRID_ZOOM && viewMode !== 'heat') {
+    viewMode = 'heat';
+    setActiveViewBtn(dom.viewHeatBtn);
+    applyFilters();
+  }
+});
 
 // ── Draw rectangle tool ──
 function onDrawStart(e) {
@@ -424,12 +493,18 @@ dom.resetBtn.onclick = () => {
   dom.sizeEligibleOnly.checked = false;
   dom.buildingType.value     = '';
   dom.storeyTier.value       = '';
+  userLockedView = false;
+  viewMode = 'heat';
+  setActiveViewBtn(dom.viewHeatBtn);
   hideDetailPanel();
   applyFilters();
   map.flyTo(MAP_CENTER, MAP_ZOOM);
 };
 
 map.on('click', e => {
+  // Dismiss search marker on any map click
+  if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
+
   if (viewMode !== 'heat' || drawMode) return;
   const cell = getFilteredFeatures().find(f => pointInPolygon(e.latlng.lat, e.latlng.lng, f));
   if (cell) showCellDetail(cell);
