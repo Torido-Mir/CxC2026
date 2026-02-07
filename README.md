@@ -1,4 +1,4 @@
-# Urban Heat Island Map – Waterloo Region
+# CxC2026 – Urban Heat Island Map (Waterloo Region)
 
 Uses building footprint density as a proxy for urban heat intensity. Higher coverage = more impervious surface = warmer microclimate.
 
