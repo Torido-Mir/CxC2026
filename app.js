@@ -205,8 +205,8 @@ function renderGrid(features) {
     onEachFeature(feature, layer) {
       const p = feature.properties;
       layer.bindTooltip(
-        `<b>${p.coverage_pct.toFixed(1)}%</b> coverage · ${p.building_count} buildings`,
-        { sticky: true }
+        `<b>${p.coverage_pct.toFixed(1)}%</b> coverage<br>${p.building_count} buildings`,
+        { sticky: true, className: 'grid-tooltip', direction: 'top', offset: [0, -8] }
       );
       layer.on('click', () => showCellDetail(feature));
     }
@@ -534,6 +534,10 @@ Promise.all([
   });
 
   applyFilters();
+
+  // Dismiss loading overlay
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) { overlay.classList.add('hidden'); setTimeout(() => overlay.remove(), 500); }
 }).catch(err => {
   document.body.insertAdjacentHTML('beforeend',
     '<p style="position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#c00;color:#fff;padding:8px 16px;border-radius:8px;z-index:9999;">' +
@@ -544,10 +548,26 @@ Promise.all([
 
 // ── 13. Chat Module ───────────────────────────────────────
 dom.chatToggle.onclick = () => {
-  dom.chatPanel.classList.toggle('visible');
-  dom.chatToggle.classList.toggle('open');
-  dom.chatToggle.classList.add('interacted');          // stop pulse ring
-  if (dom.chatPanel.classList.contains('visible')) dom.chatInput.focus();
+  dom.chatToggle.classList.add('interacted');
+  const isOpen = dom.chatPanel.classList.contains('visible');
+  if (isOpen) {
+    dom.chatPanel.classList.add('closing');
+    dom.chatToggle.classList.remove('open');
+    dom.chatPanel.addEventListener('animationend', function handler() {
+      dom.chatPanel.removeEventListener('animationend', handler);
+      dom.chatPanel.classList.remove('visible', 'closing');
+    });
+  } else {
+    dom.chatPanel.classList.remove('closing');
+    dom.chatPanel.classList.add('visible');
+    dom.chatToggle.classList.add('open');
+    dom.chatInput.focus();
+  }
+};
+
+// ── Collapsible filter panel ──────────────────────────────
+document.querySelector('.panel h3').onclick = () => {
+  document.querySelector('.panel').classList.toggle('collapsed');
 };
 
 dom.chatNewBtn.onclick = () => {
