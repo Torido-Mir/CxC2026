@@ -103,7 +103,7 @@ Each building record contains:
 | size_eligible | `true` if TotalSqft ≤ 6,458 sq ft (600 m²) |
 | storey_category | `"low"` (1–2), `"mid"` (3–6), `"high"` (7+) |
 | svr_proxy | Surface-to-volume ratio proxy (higher → more heat loss → stronger retrofit case) |
-| BuildingType | Residential, Commercial, Agricultural, Industrial, Utility and Miscellaneous |
+| BuildingType | Residential, Business, Mercantile, Industrial, Assembly, Educational, Institutional, Agricultural, Utility and Miscellaneous |
 
 ### Neighbourhood Statistics (per Settlement)
 | Metric | Description |
@@ -208,7 +208,7 @@ TOOLS = [
                     },
                     "building_type": {
                         "type": "string",
-                        "enum": ["", "Residential", "Commercial", "Agricultural", "Utility and Miscellaneous"],
+                        "enum": ["", "Residential", "Business", "Mercantile", "Industrial", "Assembly", "Educational", "Institutional", "Agricultural", "Utility and Miscellaneous"],
                         "description": "Filter by building type. Empty string for all."
                     },
                     "storey_tier": {

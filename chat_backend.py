@@ -145,14 +145,32 @@ async def chat(req: ChatRequest):
     # Send to Backboard — use GPT-4o which has native parallel tool calling
     # and works with submit_tool_outputs (Gemini 3 Pro requires thought_signatures
     # that Backboard doesn't support yet).
-    response = await client.add_message(
-        thread_id=thread_id,
-        content=enriched,
-        llm_provider="openai",
-        model_name="gpt-4o",
-        memory="Auto",
-        stream=False,
-    )
+    try:
+        response = await client.add_message(
+            thread_id=thread_id,
+            content=enriched,
+            llm_provider="openai",
+            model_name="gpt-4o",
+            memory="Auto",
+            stream=False,
+        )
+    except Exception as e:
+        err_str = str(e)
+        # Corrupted thread (dangling tool calls) — start fresh automatically
+        if "tool_call_id" in err_str or "tool_calls" in err_str:
+            logger.warning("Thread %s is corrupted (dangling tool calls). Creating new thread.", thread_id)
+            thread = await client.create_thread(ASSISTANT_ID)
+            thread_id = str(thread.thread_id)
+            response = await client.add_message(
+                thread_id=thread_id,
+                content=enriched,
+                llm_provider="openai",
+                model_name="gpt-4o",
+                memory="Auto",
+                stream=False,
+            )
+        else:
+            raise HTTPException(status_code=502, detail=f"LLM API error: {err_str}")
 
     logger.info(
         "Backboard response: status=%s, tool_calls=%s, content_len=%s",
@@ -192,11 +210,20 @@ async def chat(req: ChatRequest):
             })
 
         # Submit tool outputs so the LLM can generate its final text response
-        response = await client.submit_tool_outputs(
-            thread_id=thread_id,
-            run_id=response.run_id,
-            tool_outputs=tool_outputs,
-        )
+        try:
+            response = await client.submit_tool_outputs(
+                thread_id=thread_id,
+                run_id=response.run_id,
+                tool_outputs=tool_outputs,
+            )
+        except Exception as e:
+            logger.warning("submit_tool_outputs failed (round %d): %s", tool_round, e)
+            # Return what we have so far — the actions are already collected
+            return ChatResponse(
+                message="I've applied the requested actions to the map. (The assistant encountered a minor issue completing its response.)",
+                thread_id=str(thread_id),
+                actions=actions,
+            )
         logger.info(
             "After submit_tool_outputs (round %d): status=%s, tool_calls=%s, content_len=%s",
             tool_round,
