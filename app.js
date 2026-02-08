@@ -546,6 +546,7 @@ Promise.all([
 dom.chatToggle.onclick = () => {
   dom.chatPanel.classList.toggle('visible');
   dom.chatToggle.classList.toggle('open');
+  dom.chatToggle.classList.add('interacted');          // stop pulse ring
   if (dom.chatPanel.classList.contains('visible')) dom.chatInput.focus();
 };
 
@@ -661,7 +662,14 @@ async function sendChatMessage() {
     addChatMsg('assistant', data.message, data.actions);
     executeActions(data.actions);
   } catch (err) {
-    addChatMsg('system', `Error: ${err.message}. Is the backend running? (uvicorn chat_backend:app --port 8001)`);
+    const msg = err.message || '';
+    // Corrupted thread — auto-reset and tell the user
+    if (msg.includes('tool_call') || msg.includes('tool_calls')) {
+      chatThreadId = null;
+      addChatMsg('system', 'The conversation hit a glitch and has been reset. Please try your message again.');
+    } else {
+      addChatMsg('system', `Error: ${msg}. Is the backend running? (uvicorn chat_backend:app --port 8001)`);
+    }
     console.error('Chat error:', err);
   } finally {
     dom.chatSendBtn.disabled = false;

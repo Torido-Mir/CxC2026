@@ -16,28 +16,35 @@ body { font-family: system-ui, -apple-system, sans-serif; }
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.15);
   z-index: 1000;
+  animation: slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #333; }
 .panel label { display: block; font-size: 11px; color: #666; margin-bottom: 4px; }
-.panel input[type="range"] { width: 100%; margin-bottom: 12px; }
-.panel input[type="number"] { width: 100%; padding: 6px 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; }
+.panel input[type="range"] { width: 100%; margin-bottom: 12px; cursor: pointer; accent-color: #2166ac; }
+.panel input[type="number"] { width: 100%; padding: 6px 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; transition: border-color 0.2s, box-shadow 0.2s; }
+.panel input[type="number"]:focus { border-color: #2166ac; box-shadow: 0 0 0 3px rgba(33,102,172,0.12); outline: none; }
 .panel .range-labels { display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-top: -8px; margin-bottom: 12px; }
-.panel select { width: 100%; padding: 6px 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; }
+.panel select { width: 100%; padding: 6px 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; transition: border-color 0.2s, box-shadow 0.2s; }
+.panel select:focus { border-color: #2166ac; box-shadow: 0 0 0 3px rgba(33,102,172,0.12); outline: none; }
 .panel .checkbox-label { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 
 /* ── Search Row ───────────────────────────────────────── */
 .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
-.search-row input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-.search-row button { padding: 8px 12px; background: #2166ac; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-.search-row button:hover { background: #1a5490; }
+.search-row input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; transition: border-color 0.2s, box-shadow 0.2s; }
+.search-row input:focus { border-color: #2166ac; box-shadow: 0 0 0 3px rgba(33,102,172,0.12); outline: none; }
+.search-row button { padding: 8px 12px; background: #2166ac; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s ease; }
+.search-row button:hover { background: #1a5490; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(33,102,172,0.3); }
+.search-row button:active { transform: translateY(0); }
 
 /* ── Buttons ──────────────────────────────────────────── */
-.btn { display: block; width: 100%; padding: 8px 12px; margin-bottom: 8px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-.btn:hover { background: #333; }
+.btn { display: block; width: 100%; padding: 8px 12px; margin-bottom: 8px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.2s ease; }
+.btn:hover { background: #333; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.btn:active { transform: translateY(0); box-shadow: none; }
 .btn.active { background: #2166ac; }
 .btn.secondary { background: #666; }
 .view-btns { display: flex; gap: 8px; margin-bottom: 12px; }
-.view-btns .btn { flex: 1; margin-bottom: 0; }
+.view-btns .btn { flex: 1; margin-bottom: 0; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+.view-btns .btn.active { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(33,102,172,0.35); }
 
 /* ── Legend ────────────────────────────────────────────── */
 .legend {
@@ -49,10 +56,18 @@ body { font-family: system-ui, -apple-system, sans-serif; }
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   z-index: 1000;
+  animation: fadeInUp 0.6s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .legend h3 { font-size: 12px; font-weight: 600; margin-bottom: 8px; color: #333; }
-.legend-scale { display: flex; gap: 4px; height: 12px; margin-bottom: 4px; }
+.legend-scale { display: flex; gap: 4px; height: 12px; margin-bottom: 4px; position: relative; overflow: hidden; }
 .legend-scale span { width: 24px; height: 12px; border-radius: 2px; }
+.legend-scale::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  animation: shimmer 3s 1s ease-in-out;
+}
 .legend-labels { display: flex; justify-content: space-between; font-size: 10px; color: #666; }
 .legend p.hint { font-size: 10px; color: #888; margin-top: 6px; }
 
@@ -69,7 +84,7 @@ body { font-family: system-ui, -apple-system, sans-serif; }
   z-index: 1000;
   display: none;
 }
-.detail-panel.visible { display: block; }
+.detail-panel.visible { display: block; animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .detail-panel h4 { font-size: 13px; margin-bottom: 10px; color: #333; }
 .detail-panel .stat { font-size: 12px; margin-bottom: 6px; color: #555; }
 .detail-panel .stat strong { color: #222; }
@@ -97,8 +112,20 @@ body { font-family: system-ui, -apple-system, sans-serif; }
   justify-content: center;
   transition: background 0.2s;
 }
-.chat-toggle:hover { background: #1a5490; }
+.chat-toggle:hover { background: #1a5490; transform: scale(1.1); }
+.chat-toggle:active { transform: scale(0.95); }
 .chat-toggle.open { background: #d6604d; }
+.chat-toggle { animation: bounceIn 0.6s 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.chat-toggle::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid #2166ac;
+  opacity: 0;
+  animation: pulseRing 3s 2s ease-out infinite;
+}
+.chat-toggle.interacted::after { animation: none; opacity: 0; }
 
 /* ── Chat Panel ───────────────────────────────────────── */
 .chat-panel {
@@ -115,7 +142,7 @@ body { font-family: system-ui, -apple-system, sans-serif; }
   flex-direction: column;
   overflow: hidden;
 }
-.chat-panel.visible { display: flex; }
+.chat-panel.visible { display: flex; animation: springUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
 .chat-header {
   padding: 12px 16px;
@@ -157,6 +184,7 @@ body { font-family: system-ui, -apple-system, sans-serif; }
   font-size: 13px;
   line-height: 1.45;
   word-wrap: break-word;
+  animation: msgPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .chat-msg.user {
   align-self: flex-end;
@@ -263,9 +291,11 @@ body { font-family: system-ui, -apple-system, sans-serif; }
   cursor: pointer;
   font-size: 13px;
   white-space: nowrap;
+  transition: all 0.2s ease;
 }
-.chat-input-row button:hover { background: #1a5490; }
-.chat-input-row button:disabled { background: #aaa; cursor: not-allowed; }
+.chat-input-row button:hover { background: #1a5490; transform: scale(1.05); }
+.chat-input-row button:active { transform: scale(0.97); }
+.chat-input-row button:disabled { background: #aaa; cursor: not-allowed; transform: none; }
 
 .chat-typing {
   padding: 4px 16px 8px;
@@ -274,4 +304,75 @@ body { font-family: system-ui, -apple-system, sans-serif; }
   font-style: italic;
   display: none;
 }
-.chat-typing.visible { display: block; }
+.chat-typing.visible { display: flex; align-items: center; gap: 4px; }
+.chat-typing .dot {
+  width: 5px; height: 5px;
+  background: #999;
+  border-radius: 50%;
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+.chat-typing .dot:nth-child(2) { animation-delay: 0.15s; }
+.chat-typing .dot:nth-child(3) { animation-delay: 0.3s; }
+
+/* ── Keyframe Animations ──────────────────────────────── */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+@keyframes bounceIn {
+  from { opacity: 0; transform: scale(0.3); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes pulseRing {
+  0%   { transform: scale(1); opacity: 0.6; }
+  70%  { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes springUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes msgPop {
+  from { opacity: 0; transform: scale(0.85) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30%           { transform: translateY(-4px); }
+}
+
+/* ── Toast Notifications ──────────────────────────────── */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  z-index: 9999;
+  opacity: 0;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.toast.warning { background: #e69500; }
+.toast.error { background: #d6604d; }
