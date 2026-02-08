@@ -606,6 +606,7 @@ function getMapState() {
     building_type:      dom.buildingType.value,
     storey_tier:        dom.storeyTier.value,
     min_coverage:       parseFloat(dom.covMin.value),
+    min_buildings:      parseInt(dom.minBuildings.value, 10),
     show_buildings:     dom.showBuildings.checked,
   };
 }
@@ -639,6 +640,10 @@ function executeActions(actions) {
         if (action.min_coverage != null) {
           dom.covMin.value          = action.min_coverage;
           dom.covMinVal.textContent = action.min_coverage;
+        }
+        if (action.min_buildings != null) {
+          dom.minBuildings.value          = action.min_buildings;
+          dom.minBuildingsVal.textContent = action.min_buildings;
         }
         applyFilters();
         break;

@@ -83,6 +83,7 @@ stacked or joined by a common space.
 ≥ 50 % of total floor area is residential and non-residential space ≤ 300 m².
 - **Size-eligible** (in this system): TotalSqft ≤ 6,458 sq ft (600 m²), \
 aligning with the MURB footprint threshold used by federal programmes.
+- Region of Waterloo or Waterloo Region: All neighborhoods within the dataset.
 
 ## 3. Geospatial Data Layers
 
@@ -124,6 +125,18 @@ Wallenstein, Waterloo, Wellesley, West Montrose, Woolwich
 
 ## 5. Tool Usage Rules
 
+### Document Search (RAG) — ALWAYS USE FIRST
+- **Before answering any grant-related question**, call `search_documents` to \
+retrieve the most relevant information from the uploaded grant documents.
+- Prefer RAG-sourced information over your general knowledge. If the documents \
+contain relevant data, cite it directly.
+- You may call `search_documents` multiple times with different queries in a \
+single response to gather comprehensive information.
+
+### Map Tools — USE LIBERALLY
+- Call tools **proactively** whenever your response mentions a settlement, \
+building type, filter, or map adjustment — don't wait for the user to ask \
+explicitly.
 - When you reference a specific settlement, call **highlight_settlement** to \
 select it on the map.
 - When recommending an area for closer inspection, call **zoom_to_settlement**.
@@ -134,8 +147,14 @@ in the same response:
 - For building-type queries (e.g., "show residential buildings"), also call \
 BOTH `show_building_points` and `apply_filters` with the appropriate \
 `building_type` parameter.
-- You may call multiple tools in a single response when the user's request \
-requires it.
+- To adjust the **area coverage slider** (min coverage %), call \
+`apply_filters(min_coverage=<value>)` with a value between 0.1 and 60. \
+Higher values hide low-coverage cells and emphasise urban heat island hotspots.
+- To adjust the **min buildings per cell slider**, call \
+`apply_filters(min_buildings=<value>)` with an integer between 0 and 50. \
+Higher values filter out sparse grid cells and focus on denser urban areas.
+- You may call **any combination of tools** in a single response. Be generous \
+with tool calls — it is better to call a tool and be helpful than to skip it.
 
 ## 6. Response Guidelines
 
@@ -218,7 +237,11 @@ TOOLS = [
                     },
                     "min_coverage": {
                         "type": "number",
-                        "description": "Minimum coverage % to display on the heatmap"
+                        "description": "Minimum coverage % to display on the heatmap (slider range: 0.1 to 60)"
+                    },
+                    "min_buildings": {
+                        "type": "integer",
+                        "description": "Minimum number of buildings per grid cell to display (slider range: 0 to 50). Higher values hide sparse cells and focus on denser urban areas."
                     }
                 }
             }
@@ -272,9 +295,6 @@ async def main():
                     assistant_id=assistant_id,
                     file_path=filepath,
                 )
-                print(f"  Uploaded {os.path.basename(filepath)}")
-    else:
-        print(f"No grant_docs/ directory found. Create it and add PDFs/text, then re-run.")
 
     print(f"\nDone! Add this to your .env:\nBACKBOARD_ASSISTANT_ID={assistant_id}")
 
